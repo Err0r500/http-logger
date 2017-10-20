@@ -64,3 +64,16 @@ func TestPOST(t *testing.T) {
 			assert.Equal(t, "authToken", auth)
 		})
 }
+func TestInvalid(t *testing.T) {
+	r := gofight.New()
+
+	r.POST("/anotherendpoint").
+		SetBody("{a:aze}"). // invalid body
+		Run(SetupServer(), func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
+			assert.Equal(t, http.StatusOK, r.Code)
+			body := r.Body.Bytes()
+
+			bodyA, _, _, _ := jsonparser.Get(body, "body")
+			assert.Empty(t, bodyA)
+		})
+}
